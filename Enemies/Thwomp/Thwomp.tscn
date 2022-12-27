@@ -1,0 +1,87 @@
+[gd_scene load_steps=14 format=2]
+
+[ext_resource path="res://Enemies/Thwomp/Thwomp01.png" type="Texture" id=1]
+[ext_resource path="res://Enemies/Thwomp/Thwomp02.png" type="Texture" id=2]
+[ext_resource path="res://Enemies/HitBox.tscn" type="PackedScene" id=3]
+[ext_resource path="res://Enemies/Thwomp/Thwomp.gd" type="Script" id=4]
+[ext_resource path="res://VFX/Dust_Particle.png" type="Texture" id=5]
+[ext_resource path="res://Sound_Effects/Land.wav" type="AudioStream" id=6]
+
+[sub_resource type="SpriteFrames" id=1]
+animations = [ {
+"frames": [ ExtResource( 2 ) ],
+"loop": true,
+"name": "Falling",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 1 ) ],
+"loop": true,
+"name": "Rising",
+"speed": 5.0
+} ]
+
+[sub_resource type="RectangleShape2D" id=2]
+extents = Vector2( 16, 16 )
+
+[sub_resource type="Gradient" id=3]
+offsets = PoolRealArray( 0.470968, 1 )
+colors = PoolColorArray( 0.858824, 0.858824, 0.858824, 0.623529, 1, 1, 1, 0 )
+
+[sub_resource type="GradientTexture" id=4]
+gradient = SubResource( 3 )
+
+[sub_resource type="Curve" id=5]
+_data = [ Vector2( 0, 1 ), 0.0, 0.0, 0, 0, Vector2( 1, 0 ), -2.57249, 0.0, 0, 0 ]
+
+[sub_resource type="CurveTexture" id=6]
+curve = SubResource( 5 )
+
+[sub_resource type="ParticlesMaterial" id=7]
+emission_shape = 2
+emission_box_extents = Vector3( 16, 2, 0 )
+flag_disable_z = true
+direction = Vector3( 0, -1, 0 )
+gravity = Vector3( 0, 2, 0 )
+initial_velocity = 40.0
+initial_velocity_random = 1.0
+orbit_velocity = 0.0
+orbit_velocity_random = 0.0
+scale_random = 1.0
+scale_curve = SubResource( 6 )
+color = Color( 0.960784, 0.960784, 0.960784, 0.560784 )
+color_ramp = SubResource( 4 )
+
+[node name="Thwomp" type="Node2D"]
+script = ExtResource( 4 )
+
+[node name="AnimatedSprite" type="AnimatedSprite" parent="."]
+position = Vector2( 0, -16 )
+frames = SubResource( 1 )
+animation = "Rising"
+
+[node name="HitBox" parent="AnimatedSprite" instance=ExtResource( 3 )]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AnimatedSprite/HitBox"]
+shape = SubResource( 2 )
+
+[node name="RayCast2D" type="RayCast2D" parent="."]
+position = Vector2( 0, -16 )
+enabled = true
+cast_to = Vector2( 0, 22 )
+
+[node name="Timer" type="Timer" parent="."]
+one_shot = true
+
+[node name="Particles2D" type="Particles2D" parent="."]
+emitting = false
+amount = 64
+lifetime = 0.6
+one_shot = true
+explosiveness = 1.0
+local_coords = false
+process_material = SubResource( 7 )
+texture = ExtResource( 5 )
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 6 )
+volume_db = -20.0
